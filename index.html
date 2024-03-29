@@ -53,27 +53,34 @@
 
     <script>
         window.onload = function() {
-            // Extract name parameter from the URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const name = urlParams.get('name');
-            
-            // Display the name
-            document.getElementById('name').textContent = name;
-            
-            // Modify the URL to replace role=guest with role=host and name with "Demo Provider"
-            const modifiedURL = window.location.href.replace('role=guest', 'role=host').replace('name=' + name, 'name=Demo%20Provider');
-            
-            // Update the href of the Join Session button
-            document.getElementById('joinButton').href = modifiedURL;
+            // Retrieve tempURL from storage
+            const tempURL = localStorage.getItem('tempURL');
+            if (tempURL) {
+                // Extract name parameter from the URL
+                const urlParams = new URLSearchParams(tempURL);
+                const name = urlParams.get('name');
+                
+                // Display the name
+                document.getElementById('name').textContent = name;
+                
+                // Modify the URL to replace role=guest with role=host and name with "Demo Provider"
+                const modifiedURL = tempURL.replace('role=guest', 'role=host').replace('name=' + name, 'name=Demo%20Provider');
+                
+                // Update the href of the Join Session button
+                document.getElementById('joinButton').href = modifiedURL;
 
-            // Remove the name and "Join Session" button and clear tempURL from storage when the Join Session button is clicked
-            document.getElementById('joinButton').onclick = function() {
-                // Remove the joinSessionBox
-                document.getElementById('joinSessionBox').remove();
+                // Remove the name and "Join Session" button and clear tempURL from storage when the Join Session button is clicked
+                document.getElementById('joinButton').onclick = function() {
+                    // Remove the joinSessionBox
+                    document.getElementById('joinSessionBox').remove();
 
-                // Clear tempURL from storage
-                localStorage.removeItem('tempURL');
-            };
+                    // Clear tempURL from storage
+                    localStorage.removeItem('tempURL');
+                };
+            } else {
+                // If tempURL is not available, display an error message or handle it accordingly
+                console.error('tempURL is not available.');
+            }
         };
     </script>
 </body>
