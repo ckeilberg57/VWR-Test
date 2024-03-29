@@ -44,7 +44,7 @@
 <body>
     <h1>Join Session</h1>
     <div id="nameBox" class="name-box"></div>
-    <button id="joinButton" class="join-button" onclick="joinSession()">Join Session</button>
+    <button id="joinButton" class="join-button" style="display:none;" onclick="joinSession()">Join Session</button>
 
     <script>
         window.onload = function() {
@@ -52,6 +52,8 @@
             const tempURL = localStorage.getItem('tempURL');
 
             if (tempURL) {
+                document.getElementById('joinButton').style.display = 'block';
+
                 // Extract name from the URL
                 const urlParams = new URLSearchParams(tempURL.split('?')[1]);
                 const name = urlParams.get('name');
@@ -87,7 +89,7 @@
 
                 // Construct updated URL
                 const updatedParams = urlParams.toString();
-                const updatedURL = `${window.location.origin}${window.location.pathname}?${updatedParams}`;
+                const updatedURL = `https://cklab-edges.ck-collab-engtest${window.location.pathname}?${updatedParams}`;
 
                 // Clear tempURL
                 localStorage.removeItem('tempURL');
