@@ -11,20 +11,26 @@
             padding: 20px;
             background-color: #f4f4f4;
             color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         h1 {
             text-align: center;
         }
-        .session-info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
+        .session-info-container {
+            text-align: center;
+            max-width: 8in; /* Limit width to 8 inches */
             padding: 10px;
             background-color: #eee;
             border: 1px solid #ccc;
             border-radius: 4px;
-            max-width: 8in; /* Limit width to 8 inches */
-            overflow: hidden; /* Hide overflowing content */
+        }
+        .session-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         .session-info img {
             width: 50px;
@@ -34,6 +40,7 @@
         }
         .session-details {
             flex: 1;
+            text-align: left;
         }
         .name {
             font-weight: bold;
@@ -58,24 +65,19 @@
         .join-button:hover {
             background-color: #007d3d;
         }
-
-        /* Media query for smaller screens */
-        @media screen and (max-width: 600px) {
-            .session-info {
-                max-width: 100%; /* Occupy full width on smaller screens */
-            }
-        }
     </style>
 </head>
 <body>
     <h1>Join Session</h1>
-    <div id="sessionInfo" class="session-info" style="display:none;">
-        <img src="user.png" alt="User Image">
-        <div class="session-details">
-            <div class="name" id="nameBox"></div>
-            <div class="counter" id="counterBox"></div>
+    <div class="session-info-container">
+        <div id="sessionInfo" class="session-info" style="display:none;">
+            <img src="user.png" alt="User Image">
+            <div class="session-details">
+                <div class="name" id="nameBox"></div>
+                <div class="counter" id="counterBox"></div>
+            </div>
+            <button id="joinButton" class="join-button" onclick="joinSession()">Join</button>
         </div>
-        <button id="joinButton" class="join-button" onclick="joinSession()">Join</button>
     </div>
 
     <script>
