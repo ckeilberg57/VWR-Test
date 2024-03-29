@@ -23,6 +23,8 @@
             background-color: #eee;
             border: 1px solid #ccc;
             border-radius: 4px;
+            max-width: 8in; /* Limit width to 8 inches */
+            overflow: hidden; /* Hide overflowing content */
         }
         .session-info img {
             width: 50px;
@@ -56,41 +58,53 @@
         .join-button:hover {
             background-color: #007d3d;
         }
+
+        /* Media query for smaller screens */
+        @media screen and (max-width: 600px) {
+            .session-info {
+                max-width: 100%; /* Occupy full width on smaller screens */
+            }
+        }
     </style>
 </head>
 <body>
     <h1>Join Session</h1>
-    <div id="sessionInfo" class="session-info">
+    <div id="sessionInfo" class="session-info" style="display:none;">
         <img src="user.png" alt="User Image">
         <div class="session-details">
             <div class="name" id="nameBox"></div>
             <div class="counter" id="counterBox"></div>
         </div>
-        <button id="joinButton" class="join-button" style="display:none;" onclick="joinSession()">Join</button>
+        <button id="joinButton" class="join-button" onclick="joinSession()">Join</button>
     </div>
 
     <script>
         window.onload = function() {
+            checkTempURL();
+            setInterval(checkTempURL, 10000); // Check tempURL every 10 seconds
+        };
+
+        function checkTempURL() {
             // Extract URL from temp storage
             const tempURL = localStorage.getItem('tempURL');
 
             if (tempURL) {
-                document.getElementById('joinButton').style.display = 'block';
+                document.getElementById('sessionInfo').style.display = 'flex';
 
                 // Extract name from the URL
                 const urlParams = new URLSearchParams(tempURL.split('?')[1]);
                 const name = urlParams.get('name');
 
-                // Create box with the extracted name
+                // Create session info with the extracted name
                 if (name) {
                     createSessionInfo(name);
                 } else {
                     console.error('Name not found in URL parameters.');
                 }
             } else {
-                console.error('URL not found in temp storage.');
+                document.getElementById('sessionInfo').style.display = 'none';
             }
-        };
+        }
 
         function createSessionInfo(name) {
             const nameBox = document.getElementById('nameBox');
@@ -127,15 +141,6 @@
                 console.error('URL not found in temp storage.');
             }
         }
-
-        // Listen for changes in tempURL storage
-        window.addEventListener('storage', function(event) {
-            if (event.key === 'tempURL') {
-                // Handle changes to tempURL
-                // For simplicity, just reload the page to reflect the changes
-                location.reload();
-            }
-        });
     </script>
 </body>
 </html>
