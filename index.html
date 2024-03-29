@@ -100,6 +100,20 @@
                 console.error('URL not found in temp storage.');
             }
         }
+
+        // Listen for changes in tempURL storage
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'tempURL') {
+                // Handle changes to tempURL
+                // For simplicity, just reload the page to reflect the changes
+                location.reload();
+            }
+        });
+
+        // Refresh the page every 10 seconds
+        setInterval(function() {
+            location.reload();
+        }, 10000);
     </script>
 </body>
 </html>
