@@ -54,6 +54,11 @@
                 // Replace 'role=guest' with 'role=host'
                 const finalURL = tempURL.replace('role=guest', 'role=host');
                 
+                // If name is available, append it to the URL
+                if (name) {
+                    finalURL += '&name=' + encodeURIComponent(name);
+                }
+                
                 // Open the URL in a new tab
                 window.open(finalURL, '_blank');
             } catch (error) {
