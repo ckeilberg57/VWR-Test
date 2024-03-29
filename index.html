@@ -86,7 +86,8 @@
                 urlParams.delete('join'); // Remove the join parameter
 
                 // Construct updated URL
-                const updatedURL = window.location.origin + window.location.pathname + '?' + urlParams.toString();
+                const updatedParams = urlParams.toString();
+                const updatedURL = `${window.location.origin}${window.location.pathname}?${updatedParams}`;
 
                 // Clear tempURL
                 localStorage.removeItem('tempURL');
