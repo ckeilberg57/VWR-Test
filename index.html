@@ -89,7 +89,7 @@
 
                 // Construct updated URL
                 const updatedParams = urlParams.toString();
-                const updatedURL = `https://cklab-edges.ck-collab-engtest${window.location.pathname}?${updatedParams}`;
+                const updatedURL = `https://cklab-edges.ck-collab-engtest.com/webapp3/${window.location.pathname.split('/')[2]}?${updatedParams}`;
 
                 // Clear tempURL
                 localStorage.removeItem('tempURL');
