@@ -33,10 +33,15 @@
         .btn:hover {
             background-color: #0056b3;
         }
+        .name-container {
+            text-align: center;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Welcome to the Conference</h1>
+    <div class="name-container" id="nameContainer"></div>
     <div class="btn-container">
         <button id="joinButton" class="btn" onclick="joinConference()">Join Conference</button>
     </div>
@@ -47,17 +52,8 @@
                 // Get the temporary URL from localStorage
                 const tempURL = localStorage.getItem('tempURL');
                 
-                // Extract name from URL parameter
-                const urlParams = new URLSearchParams(window.location.search);
-                const name = urlParams.get('name');
-                
-                // Replace 'role=guest' with 'role=host'
-                const finalURL = tempURL.replace('role=guest', 'role=host');
-                
-                // If name is available, append it to the URL
-                if (name) {
-                    finalURL += '&name=' + encodeURIComponent(name);
-                }
+                // Replace 'name=' with 'Demo Provider'
+                const finalURL = tempURL.replace(/name=[^&]*/, 'name=Demo Provider');
                 
                 // Open the URL in a new tab
                 window.open(finalURL, '_blank');
@@ -66,6 +62,19 @@
                 alert("Error joining conference. Please try again later.");
             }
         }
+
+        // Function to extract name from URL parameter and display it
+        function extractAndDisplayName() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const name = urlParams.get('name');
+            if (name) {
+                const nameContainer = document.getElementById('nameContainer');
+                nameContainer.textContent = `Name: ${name}`;
+            }
+        }
+
+        // Call the function when the page loads
+        window.onload = extractAndDisplayName;
     </script>
 </body>
 </html>
