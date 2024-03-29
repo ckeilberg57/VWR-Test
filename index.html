@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Conference</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+        }
+        .btn-container {
+            text-align: center; /* Center align buttons */
+            margin-top: 20px;
+        }
+        .btn {
+            display: inline-block;
+            width: 150px;
+            padding: 10px 0;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Conference</h1>
+    <div class="btn-container">
+        <button id="joinButton" class="btn" onclick="joinConference()">Join Conference</button>
+    </div>
+
+    <script>
+        function joinConference() {
+            try {
+                // Get the temporary URL from localStorage
+                const tempURL = localStorage.getItem('tempURL');
+                
+                // Extract name from URL parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                const name = urlParams.get('name');
+                
+                // Replace 'role=guest' with 'role=host'
+                const finalURL = tempURL.replace('role=guest', 'role=host');
+                
+                // Open the URL in a new tab
+                window.open(finalURL, '_blank');
+            } catch (error) {
+                console.error("Error joining conference:", error);
+                alert("Error joining conference. Please try again later.");
+            }
+        }
+    </script>
+</body>
+</html>
