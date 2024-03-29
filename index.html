@@ -185,3 +185,27 @@
             const joinSessionContainer = document.getElementById('joinSessionContainer');
             const nameBox = document.createElement('div');
             nameBox.textContent = "Name: " + name;
+            const joinButton = document.createElement('button');
+            joinButton.textContent = "Join Session";
+            joinButton.onclick = function() {
+                // Replace the role parameter with "host" and the name parameter with "Demo Provider"
+                const modifiedURL = tempURL.replace('role=guest', 'role=host').replace('name=' + name, 'name=Demo%20Provider');
+                // Redirect to the modified URL
+                window.open(modifiedURL, '_blank');
+                // Clear the temporary URL storage
+                clearURLTemporarily();
+                // Hide name and join button
+                joinSessionContainer.style.display = 'none';
+            };
+            joinSessionContainer.appendChild(nameBox);
+            joinSessionContainer.appendChild(joinButton);
+            joinSessionContainer.style.display = 'block';
+        }
+    };
+
+    </script>
+    <div class="btn-container">
+        <button id="testButton" class="btn" onclick="testAudioAndVideo()">Enable Local Audio and Video Test</button>
+    </div>
+</body>
+</html>
