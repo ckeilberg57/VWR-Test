@@ -91,8 +91,8 @@
                 // Clear tempURL
                 localStorage.removeItem('tempURL');
 
-                // Redirect to updated URL
-                window.location.replace(updatedURL);
+                // Open the updated URL in a new tab
+                window.open(updatedURL, '_blank');
             } else {
                 console.error('URL not found in temp storage.');
             }
