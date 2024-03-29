@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio and Video Check</title>
+    <title>Join Session</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,200 +12,69 @@
             background-color: #f4f4f4;
             color: #333;
         }
-        h1 {
+        .container {
             text-align: center;
+            margin-top: 50px;
         }
-        #videoContainer {
-            margin: 0 auto;
-            width: 320px;
-            height: 240px;
-            border: 1px solid #ccc;
+        h1 {
             margin-bottom: 20px;
-            position: relative;
         }
-        video {
-            width: 100%;
-            height: 100%;
-        }
-        #audioIndicator {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0%;
-            height: 5px;
-            background-color: green;
-            transition: width 0.1s ease-in-out;
-        }
-        .btn-container {
-            text-align: center; /* Center align buttons */
+        .box {
+            display: inline-block;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .btn {
             display: inline-block;
-            width: 45%; /* Adjust button width */
-            margin-right: 10px; /* Adjust button spacing */
-            padding: 10px 0;
+            padding: 10px 20px;
             background-color: #007bff;
             color: #fff;
-            text-decoration: none;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-        }
-        .btn:last-child {
-            margin-right: 0;
+            text-decoration: none;
         }
         .btn:hover {
             background-color: #0056b3;
         }
-        .btn.green {
-            background-color: green; /* Change button color to green */
-        }
-        #patientImage {
-            width: 100%;
-            height: 100%;
-        }
     </style>
 </head>
 <body>
-    <h1>Audio and Video Check</h1>
-    <div id="videoContainer">
-        <video id="videoElement" autoplay playsinline muted style="display: none;"></video>
-        <img id="patientImage" src="patientSmall.png" alt="Patient" />
-        <div id="audioIndicator"></div>
-    </div>
-    <div class="btn-container" id="joinSessionContainer" style="display: none;">
-        <!-- Box with name and Join Session button -->
+    <div class="container">
+        <h1>Join Session</h1>
+        <div class="box" id="joinSessionBox">
+            <p>Name: <span id="name"></span></p>
+            <a id="joinButton" class="btn" href="#" target="_blank">Join Session</a>
+        </div>
     </div>
 
     <script>
-        let analyser;
-        let audioIndicator;
-        let patientImage;
-        let originalWidth = 0; // Store original width of the audio indicator
-        let confirmedButtonAdded = false; // Flag to track whether the confirmed button has been added
-
-        async function testAudioAndVideo() {
-            try {
-                const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-
-                const audioContext = new AudioContext();
-                const microphone = audioContext.createMediaStreamSource(audioStream);
-                analyser = audioContext.createAnalyser();
-                microphone.connect(analyser);
-
-                // Configure the analyser node
-                analyser.fftSize = 32;
-                const bufferLength = analyser.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-
-                // Create audio indicator element
-                audioIndicator = document.getElementById('audioIndicator');
-                if (originalWidth === 0) {
-                    originalWidth = audioIndicator.clientWidth; // Store original width
-                }
-
-                // Update the audio indicator continuously
-                function updateAudioIndicator() {
-                    requestAnimationFrame(updateAudioIndicator);
-                    analyser.getByteFrequencyData(dataArray);
-                    const average = dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
-                    const width = Math.max(0, Math.min(average, 255)); // Limit width between 0 and 255
-                    audioIndicator.style.width = (width * 2) + 'px'; // Double the width
-
-                    // If audio and video are confirmed and the button hasn't been added yet, add "Confirmed" button
-                    if (width > 0 && document.getElementById('videoElement').videoWidth > 0 && !confirmedButtonAdded) {
-                        addConfirmedButton();
-                        confirmedButtonAdded = true; // Set the flag to true
-                    }
-                }
-                updateAudioIndicator();
-
-                const videoElement = document.getElementById('videoElement');
-                videoElement.srcObject = audioStream;
-                videoElement.style.display = 'block'; // Show video element
-
-                // Hide patient image
-                patientImage = document.getElementById('patientImage');
-                patientImage.src = "images/patient.png"; // Set image source
-                patientImage.style.display = 'none';
-
-            } catch (error) {
-                console.error('Error accessing media devices:', error);
-            }
-        }
-
-    function addConfirmedButton() {
-        const btnContainer = document.querySelector('.btn-container');
-        const confirmedButton = document.createElement('button');
-        confirmedButton.className = 'btn green';
-        confirmedButton.textContent = 'Confirmed';
-        confirmedButton.onclick = function() {
-            // Get the name entered by the user
-            const name = prompt("Please enter your name:");
-            if (name !== null && name.trim() !== "") {
-                // Generate random conference number
-                const conference = "apptMD" + Math.floor(1000000000 + Math.random() * 9000000000);
-                // Construct the URL with name and conference parameters
-                const url = `https://cklab-edges.ck-collab-engtest.com/webapp3/?name=${encodeURIComponent(name)}&conference=${conference}&role=host&join=1`;
-                
-                // Clear the temporary URL storage
-                clearURLTemporarily();
-                
-                // Hide name and join button
-                document.getElementById('joinSessionContainer').style.display = 'none';
-                
-                // Redirect to the constructed URL
-                window.open(url, '_blank');
-            } else {
-                alert("Name cannot be empty. Please enter your name.");
-            }
-        };
-        btnContainer.appendChild(confirmedButton);
-    }
-    
-    function clearURLTemporarily() {
-        try {
-            // Clear the URL from localStorage
-            localStorage.removeItem('tempURL');
-            console.log("Temporary URL storage cleared.");
-        } catch (error) {
-            console.error("Error clearing temporary URL storage:", error);
-        }
-    }
-
-    // Check for stored URL on page load
-    window.onload = function() {
-        const tempURL = localStorage.getItem('tempURL');
-        if (tempURL) {
+        window.onload = function() {
             // Extract name parameter from the URL
-            const params = new URLSearchParams(tempURL);
-            const name = params.get('name');
+            const urlParams = new URLSearchParams(window.location.search);
+            const name = urlParams.get('name');
             
-            // Create box with name and Join Session button
-            const joinSessionContainer = document.getElementById('joinSessionContainer');
-            const nameBox = document.createElement('div');
-            nameBox.textContent = "Name: " + name;
-            const joinButton = document.createElement('button');
-            joinButton.textContent = "Join Session";
-            joinButton.onclick = function() {
-                // Replace the role parameter with "host" and the name parameter with "Demo Provider"
-                const modifiedURL = tempURL.replace('role=guest', 'role=host').replace('name=' + name, 'name=Demo%20Provider');
-                // Redirect to the modified URL
-                window.open(modifiedURL, '_blank');
-                // Clear the temporary URL storage
-                clearURLTemporarily();
-                // Hide name and join button
-                joinSessionContainer.style.display = 'none';
-            };
-            joinSessionContainer.appendChild(nameBox);
-            joinSessionContainer.appendChild(joinButton);
-            joinSessionContainer.style.display = 'block';
-        }
-    };
+            // Display the name
+            document.getElementById('name').textContent = name;
+            
+            // Modify the URL to replace role=guest with role=host and name with "Demo Provider"
+            const modifiedURL = window.location.href.replace('role=guest', 'role=host').replace('name=' + name, 'name=Demo%20Provider');
+            
+            // Update the href of the Join Session button
+            document.getElementById('joinButton').href = modifiedURL;
 
+            // Remove the name and "Join Session" button and clear tempURL from storage when the Join Session button is clicked
+            document.getElementById('joinButton').onclick = function() {
+                // Remove the joinSessionBox
+                document.getElementById('joinSessionBox').remove();
+
+                // Clear tempURL from storage
+                localStorage.removeItem('tempURL');
+            };
+        };
     </script>
-    <div class="btn-container">
-        <button id="testButton" class="btn" onclick="testAudioAndVideo()">Enable Local Audio and Video Test</button>
-    </div>
 </body>
 </html>
