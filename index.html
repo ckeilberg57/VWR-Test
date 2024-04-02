@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Provider Landing Page</title>
+    <title>Join Session</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,25 +22,29 @@
         }
         .session-info-container {
             text-align: center;
+            margin-top: 20px;
+        }
+        .session-info {
+            text-align: left;
             padding: 10px;
             background-color: #eee;
             border: 1px solid #ccc;
             border-radius: 4px;
-        }
-        .session-info {
+            margin-bottom: 10px;
+            width: 6in; /* Set width to 6 inches */
             display: flex;
             align-items: center;
-            justify-content: space-between;
         }
         .session-info img {
             width: 50px;
             height: 50px;
             border-radius: 50%;
             margin-right: 10px;
+            vertical-align: middle;
         }
         .session-details {
-            flex: 1;
-            text-align: left;
+            display: inline-block;
+            vertical-align: middle;
         }
         .name {
             font-weight: bold;
@@ -60,6 +65,7 @@
             font-size: 18px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin-left: auto;
         }
         .join-button:hover {
             background-color: #007d3d;
@@ -67,85 +73,133 @@
     </style>
 </head>
 <body>
-    <h1>Provider Current Meetings</h1>
-    <div class="session-info-container">
-        <div id="sessionInfo" class="session-info" style="display:none;">
-            <img src="images/secureMeeting.png" alt="User Image">
-            <div class="session-details">
-                <div class="name" id="nameBox"></div>
-                <div class="counter" id="counterBox"></div>
-            </div>
-            <button id="joinButton" class="join-button" onclick="joinSession()">Join</button>
-        </div>
+    <h1>Join Session</h1>
+    <div class="session-info-container" id="sessionInfoContainer">
     </div>
 
     <script>
         window.onload = function() {
-            checkTempURL();
             setInterval(checkTempURL, 10000); // Check tempURL every 10 seconds
         };
 
+        let sessions = JSON.parse(localStorage.getItem('sessions')) || [];
+
         function checkTempURL() {
-            // Extract URL from temp storage
-            const tempURL = localStorage.getItem('tempURL');
+            // Extract URLs from temp storage
+            const sessionURLs = Object.keys(localStorage).filter(key => key.includes('tempURL'));
 
-            if (tempURL) {
-                document.getElementById('sessionInfo').style.display = 'flex';
+            if (sessionURLs.length > 0) {
+                document.getElementById('sessionInfoContainer').style.display = 'block'; // Show the session info container
 
-                // Extract name from the URL
-                const urlParams = new URLSearchParams(tempURL.split('?')[1]);
-                const name = urlParams.get('name');
+                // Loop through each session URL
+                sessionURLs.forEach(urlKey => {
+                    const tempURL = localStorage.getItem(urlKey);
+                    // Extract name from the URL
+                    const urlParams = new URLSearchParams(tempURL.split('?')[1]);
+                    const name = urlParams.get('name');
 
-                // Create session info with the extracted name
-                if (name) {
-                    createSessionInfo(name);
-                } else {
-                    console.error('Name not found in URL parameters.');
-                }
+                    // Create session info with the extracted name
+                    if (name && !sessions.some(session => session.name === name)) {
+                        createSessionInfo(name, tempURL);
+                    } else {
+                        console.error('Name not found in URL parameters or session already exists.');
+                    }
+                });
             } else {
-                document.getElementById('sessionInfo').style.display = 'none';
+                document.getElementById('sessionInfoContainer').style.display = 'none'; // Hide the session info container
             }
         }
 
-        function createSessionInfo(name) {
-            const nameBox = document.getElementById('nameBox');
+        function createSessionInfo(name, tempURL) {
+            const sessionInfoContainer = document.getElementById('sessionInfoContainer');
+
+            // Create session info box
+            const sessionInfoBox = document.createElement('div');
+            sessionInfoBox.classList.add('session-info');
+
+            // Create session image
+            const sessionImage = document.createElement('img');
+            sessionImage.src = "user.png";
+            sessionImage.alt = "User Image";
+
+            // Create session details
+            const sessionDetails = document.createElement('div');
+            sessionDetails.classList.add('session-details');
+
+            // Create session name
+            const nameBox = document.createElement('div');
+            nameBox.classList.add('name');
             nameBox.textContent = name;
 
-            // Start the counter
-            let counter = 0;
-            setInterval(function() {
-                counter++;
-                document.getElementById('counterBox').textContent = `Added ${counter} seconds ago`;
+            // Create counter
+            const counterBox = document.createElement('div');
+            counterBox.classList.add('counter');
+            counterBox.textContent = 'Added 00:00 ago';
+
+            // Create join button
+            const joinButton = document.createElement('button');
+            joinButton.classList.add('join-button');
+            joinButton.textContent = 'Join';
+            joinButton.onclick = function() {
+                removeSession(sessionInfoBox, tempURL);
+            };
+
+            // Append elements
+            sessionDetails.appendChild(nameBox);
+            sessionDetails.appendChild(counterBox);
+            sessionInfoBox.appendChild(sessionImage);
+            sessionInfoBox.appendChild(sessionDetails);
+            sessionInfoBox.appendChild(joinButton);
+
+            // Append session info box to container
+            sessionInfoContainer.appendChild(sessionInfoBox);
+
+            // Store the session information
+            sessions.push({ name: name, tempURL: tempURL, startTime: Date.now() });
+
+            // Start the timer for this session
+            const intervalId = setInterval(function() {
+                const session = sessions.find(session => session.name === name);
+                if (session) {
+                    const elapsedTime = Math.floor((Date.now() - session.startTime) / 1000);
+                    const minutes = Math.floor(elapsedTime / 60);
+                    const seconds = elapsedTime % 60;
+                    const timeString = `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+                    counterBox.textContent = `Added ${timeString} ago`;
+                }
             }, 1000);
 
-            // Calculate and set width of session info box
-            const sessionInfo = document.getElementById('sessionInfo');
-            const width = nameBox.offsetWidth + document.getElementById('counterBox').offsetWidth + document.getElementById('joinButton').offsetWidth + 70;
-            sessionInfo.style.width = `${Math.min(width, 6 * 96)}px`; // Convert 6 inches to pixels (96 pixels per inch)
+            // Save sessions to local storage
+            localStorage.setItem('sessions', JSON.stringify(sessions));
         }
 
-        function joinSession() {
-            // Update URL parameters
-            const tempURL = localStorage.getItem('tempURL');
+        function removeSession(sessionInfoBox, tempURL) {
+            // Find the index of the session in sessions array
+            const sessionIndex = sessions.findIndex(session => session.tempURL === tempURL);
 
-            if (tempURL) {
-                const urlParams = new URLSearchParams(tempURL.split('?')[1]);
-                urlParams.set('name', 'Demo Provider');
-                urlParams.set('role', 'host');
-                urlParams.delete('join'); // Remove the join parameter
-
-                // Construct updated URL
-                const updatedParams = urlParams.toString();
-                const updatedURL = `https://cklab-edges.ck-collab-engtest.com/webapp3/${window.location.pathname.split('/')[2]}?${updatedParams}`;
-
-                // Clear tempURL
-                localStorage.removeItem('tempURL');
-
-                // Open the updated URL in a new tab
-                window.open(updatedURL, '_blank');
-            } else {
-                console.error('URL not found in temp storage.');
+            // Remove the session URL from localStorage
+            const urlKey = Object.keys(localStorage).find(key => localStorage.getItem(key) === tempURL);
+            if (urlKey) {
+                localStorage.removeItem(urlKey);
             }
+
+            // Remove the session info box from the UI
+            sessionInfoBox.remove();
+
+            // Open the updated URL in a new tab
+            const urlParams = new URLSearchParams(tempURL.split('?')[1]);
+            urlParams.set('name', 'Demo Provider');
+            urlParams.set('role', 'host');
+            urlParams.delete('join');
+            const updatedParams = urlParams.toString();
+            const updatedURL = `https://cklab-edges.ck-collab-engtest.com/webapp3/${window.location.pathname.split('/')[2]}?${updatedParams}`;
+            window.open(updatedURL, '_blank');
+
+            // Remove the session from the sessions array
+            sessions.splice(sessionIndex, 1);
+
+            // Save sessions to local storage
+            localStorage.setItem('sessions', JSON.stringify(sessions));
         }
     </script>
 </body>
